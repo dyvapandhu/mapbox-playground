@@ -31,8 +31,10 @@
         "consola": "^3.4.2",
         "isbot": "^5",
         "lucide-react": "^0.544.0",
+        "mapbox-gl": "^3.20.0",
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
+        "react-map-gl": "^8.1.0",
         "react-router": "^7.9.3",
         "std-env": "^3.9.0",
         "tailwind-variants": "^3.1.1"
