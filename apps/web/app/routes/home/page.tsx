@@ -5,10 +5,7 @@ import { MapViewer } from '../../components/map/MapViewer'
 import type { Route } from './+types/page'
 
 export function meta(_props: Route.MetaArgs) {
-  return [
-    { title: 'Map Dashboard' },
-    { name: 'description', content: 'Dashboard with Mapbox MVP feature' },
-  ]
+  return [{ title: 'Map Dashboard' }, { name: 'description', content: 'Mapbox POC' }]
 }
 
 const INDONESIA_BBOX = {
@@ -35,28 +32,6 @@ const SURABAYA_BBOX = {
   bearing: -20,
 }
 
-const DUMMY_GEOJSON: FeatureCollection = {
-  type: 'FeatureCollection',
-  features: [
-    {
-      type: 'Feature',
-      properties: { name: 'Jakarta Center Area' },
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [106.81, -6.18],
-            [106.84, -6.18],
-            [106.84, -6.21],
-            [106.81, -6.21],
-            [106.81, -6.18],
-          ],
-        ],
-      },
-    },
-  ],
-}
-
 const MAP_STYLES = [
   { label: 'Streets', value: 'mapbox://styles/mapbox/streets-v12' },
   { label: 'Satellite', value: 'mapbox://styles/mapbox/satellite-v9' },
@@ -66,6 +41,7 @@ const MAP_STYLES = [
 
 export default function Page() {
   const mapRef = useRef<MapRef>(null)
+  const [selectedBasemap, setSelectedBasemap] = useState('')
   const [mapStyle, setMapStyle] = useState(MAP_STYLES[0].value)
   const [showGeoJson, setShowGeoJson] = useState(false)
 
@@ -91,14 +67,14 @@ export default function Page() {
       {/* Sidebar Controls */}
       <div className="w-80 border-r border-border bg-card p-6 flex flex-col gap-6 overflow-y-auto z-10 shadow-lg">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight mb-2">Map Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Interactive Mapbox MVP Implementation</p>
+          <h1 className="text-2xl font-bold tracking-tight mb-2">Mapbox POC</h1>
+          <p className="text-sm text-muted-foreground">Interactive Mapbox Implementation</p>
         </div>
 
         <div className="space-y-6">
-          {/* Layer Selector */}
+          {/* Basemap */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold">Map Layer</label>
+            <label className="text-sm font-semibold">Basemap</label>
             <select
               className="px-3 py-2 bg-background border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
               value={mapStyle}
@@ -152,7 +128,7 @@ export default function Page() {
                 <div
                   className={`w-3 h-3 rounded-sm ${showGeoJson ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`}
                 ></div>
-                <span>Sample GeoJSON</span>
+                <span>Provinces</span>
               </div>
               <span
                 className={`text-xs px-2 py-0.5 rounded-full ${showGeoJson ? 'bg-blue-200 dark:bg-blue-800/60' : 'bg-muted-foreground/20'}`}
@@ -166,11 +142,7 @@ export default function Page() {
 
       {/* Main Map Viewer */}
       <div className="flex-1 relative bg-muted">
-        <MapViewer
-          ref={mapRef}
-          mapStyle={mapStyle}
-          geoJsonData={showGeoJson ? DUMMY_GEOJSON : null}
-        />
+        <MapViewer ref={mapRef} mapStyle={mapStyle} useBoundaries={showGeoJson} />
       </div>
     </div>
   )

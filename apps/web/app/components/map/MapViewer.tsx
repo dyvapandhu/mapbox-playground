@@ -4,11 +4,12 @@ import type { MapRef } from 'react-map-gl/mapbox'
 import Map, { Layer, Source } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import type { FeatureCollection } from 'geojson'
+import { IG_GEOJSON } from '#/constants/geojson'
 
 type MapViewerProps = {
   mapStyle: string
-  geoJsonData: FeatureCollection | null
   className?: string
+  useBoundaries?: boolean
 }
 
 const maxBounds: LngLatBoundsLike = [
@@ -62,7 +63,7 @@ const skyLayer: SkyLayer = {
 const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN
 
 export const MapViewer = forwardRef<MapRef, MapViewerProps>(
-  ({ mapStyle, geoJsonData, className }, ref) => {
+  ({ mapStyle, className, useBoundaries }, ref) => {
     return (
       <div className={`relative w-full h-full ${className || ''}`}>
         {mapboxToken ? (
@@ -75,6 +76,7 @@ export const MapViewer = forwardRef<MapRef, MapViewerProps>(
             }}
             mapStyle={mapStyle}
             mapboxAccessToken={mapboxToken}
+            projection="mercator"
             style={{ width: '100%', height: '100%' }}
             terrain={{ source: 'mapbox-dem', exaggeration: 1.5 }}
             maxBounds={maxBounds}
@@ -87,12 +89,10 @@ export const MapViewer = forwardRef<MapRef, MapViewerProps>(
               tileSize={512}
               maxzoom={14}
             />
-
             <Layer {...skyLayer} />
             <Layer {...buildingsLayer} />
-
-            {geoJsonData && (
-              <Source id="dynamic-geojson" type="geojson" data={geoJsonData}>
+            {useBoundaries && (
+              <Source id="id-geojson" type="geojson" data={IG_GEOJSON}>
                 <Layer {...geoJsonLayer} />
               </Source>
             )}
