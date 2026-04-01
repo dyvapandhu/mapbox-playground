@@ -1,6 +1,7 @@
 import type {
   FillExtrusionLayerSpecification,
   FillLayerSpecification,
+  LineLayerSpecification,
   LngLatBoundsLike,
   MapMouseEvent,
   SkyLayerSpecification,
@@ -25,13 +26,21 @@ const maxBounds: LngLatBoundsLike = [
   [142.0, 7.0], // Northeast (Max Lng, Max Lat)
 ]
 
-const geoJsonLayer: Omit<FillLayerSpecification, 'id'> = {
+const geoJsonFillLayer: Omit<FillLayerSpecification, 'id'> = {
   type: 'fill',
   source: 'composite',
   paint: {
     'fill-color': 'transparent',
     'fill-opacity': 0.9,
-    'fill-outline-color': '#fc0320',
+  },
+}
+
+const geoJsonOutlineLayer: Omit<LineLayerSpecification, 'id'> = {
+  type: 'line',
+  source: 'composite',
+  paint: {
+    'line-color': '#fc0320',
+    'line-width': 0.8,
   },
 }
 
@@ -125,8 +134,9 @@ export const MapViewer = forwardRef<MapRef, MapViewerProps>(
               </>
             )}
             {dataLayers.map((layer) => (
-              <Source key={layer.id} id={layer.id} type="geojson" data={layer.data}>
-                <Layer id={layer.id} {...geoJsonLayer} />
+              <Source key={layer.id} type="geojson" data={layer.data}>
+                <Layer id={layer.id} {...geoJsonFillLayer} />
+                <Layer {...geoJsonOutlineLayer} />
               </Source>
             ))}
           </Map>
