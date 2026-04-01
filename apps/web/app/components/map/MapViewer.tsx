@@ -1,15 +1,22 @@
-import type { FillExtrusionLayer, FillLayer, LngLatBoundsLike, SkyLayer } from 'mapbox-gl'
-import { forwardRef } from 'react'
-import type { MapRef } from 'react-map-gl/mapbox'
+import type {
+  FillExtrusionLayer,
+  FillLayer,
+  LngLatBoundsLike,
+  MapMouseEvent,
+  SkyLayer,
+} from 'mapbox-gl'
+import { forwardRef, useCallback, useState } from 'react'
+import type { MapRef, ViewState, ViewStateChangeEvent } from 'react-map-gl/mapbox'
 import Map, { Layer, Source } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
-import type { FeatureCollection } from 'geojson'
-import { IG_GEOJSON } from '#/constants/geojson'
+import { cx } from 'tailwind-variants'
+import { ID_GEOJSON } from '#/constants/geojson'
 
 type MapViewerProps = {
   mapStyle: string
   className?: string
   useBoundaries?: boolean
+  flyTo?: (long: number, lat: number) => void
 }
 
 const maxBounds: LngLatBoundsLike = [
@@ -21,9 +28,9 @@ const geoJsonLayer: Omit<FillLayer, 'source'> = {
   id: 'geojson-layer',
   type: 'fill',
   paint: {
-    'fill-color': '#0ea5e9',
-    'fill-opacity': 0.5,
-    'fill-outline-color': '#0284c7',
+    'fill-color': 'transparent',
+    'fill-opacity': 0.9,
+    'fill-outline-color': '#fc0320',
   },
 }
 
@@ -63,12 +70,25 @@ const skyLayer: SkyLayer = {
 const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN
 
 export const MapViewer = forwardRef<MapRef, MapViewerProps>(
-  ({ mapStyle, className, useBoundaries }, ref) => {
+  ({ mapStyle, className, useBoundaries, flyTo }, ref) => {
+    const [cursor, setCursor] = useState<string>('auto')
+
+    const onClick = useCallback((event: MapMouseEvent) => {
+      const { features } = event
+      const selectedFeatures = features && features[0]
+
+      if (selectedFeatures && flyTo) flyTo(event.lngLat.lng, event.lngLat.lat)
+    }, [])
+
+    const onMouseEnter = useCallback(() => setCursor('pointer'), [])
+    const onMouseLeave = useCallback(() => setCursor('auto'), [])
+
     return (
-      <div className={`relative w-full h-full ${className || ''}`}>
+      <div className={cx(className, 'relative w-full h-full')}>
         {mapboxToken ? (
           <Map
             ref={ref}
+            cursor={cursor}
             initialViewState={{
               longitude: 118.0149,
               latitude: -2.5489,
@@ -80,6 +100,10 @@ export const MapViewer = forwardRef<MapRef, MapViewerProps>(
             style={{ width: '100%', height: '100%' }}
             terrain={{ source: 'mapbox-dem', exaggeration: 1.5 }}
             maxBounds={maxBounds}
+            interactiveLayerIds={['geojson-layer']}
+            onClick={onClick}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
           >
             {/* 3D Terrain Source */}
             <Source
@@ -92,10 +116,13 @@ export const MapViewer = forwardRef<MapRef, MapViewerProps>(
             <Layer {...skyLayer} />
             <Layer {...buildingsLayer} />
             {useBoundaries && (
-              <Source id="id-geojson" type="geojson" data={IG_GEOJSON}>
+              <Source id="id-geojson" type="geojson" data={ID_GEOJSON}>
                 <Layer {...geoJsonLayer} />
               </Source>
             )}
+            <Source id="kws-trans" type="geojson" data="/geojson/kws.geojson">
+              <Layer {...geoJsonLayer} />
+            </Source>
           </Map>
         ) : (
           <div className="flex flex-col items-center justify-center w-full h-full bg-muted text-muted-foreground p-6 text-center">

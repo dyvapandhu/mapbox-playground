@@ -1,35 +1,14 @@
 import type { FeatureCollection } from 'geojson'
 import { useRef, useState } from 'react'
 import type { MapRef } from 'react-map-gl/mapbox'
+import { cx } from 'tailwind-variants'
+import { CITIES } from '#/constants/location'
+import type { Location } from '#/types/map'
 import { MapViewer } from '../../components/map/MapViewer'
 import type { Route } from './+types/page'
 
 export function meta(_props: Route.MetaArgs) {
   return [{ title: 'Map Dashboard' }, { name: 'description', content: 'Mapbox POC' }]
-}
-
-const INDONESIA_BBOX = {
-  longitude: 118.0149,
-  latitude: -2.5489,
-  zoom: 4.2,
-  pitch: 0,
-  bearing: 0,
-}
-
-const JAKARTA_BBOX = {
-  longitude: 106.829764,
-  latitude: -6.175488,
-  zoom: 16, // Zoom in closer to see buildings
-  pitch: 60, // Better angle for 3D buildings
-  bearing: -20, // Angled view
-}
-
-const SURABAYA_BBOX = {
-  longitude: 112.7378749,
-  latitude: -7.2457773,
-  zoom: 16,
-  pitch: 60,
-  bearing: -20,
 }
 
 const MAP_STYLES = [
@@ -41,17 +20,11 @@ const MAP_STYLES = [
 
 export default function Page() {
   const mapRef = useRef<MapRef>(null)
-  const [selectedBasemap, setSelectedBasemap] = useState('')
+  const [location, setLocation] = useState(CITIES[0].label)
   const [mapStyle, setMapStyle] = useState(MAP_STYLES[0].value)
   const [showGeoJson, setShowGeoJson] = useState(false)
 
-  const flyTo = (location: {
-    longitude: number
-    latitude: number
-    zoom: number
-    pitch?: number
-    bearing?: number
-  }) => {
+  const flyTo = (location: Location) => {
     mapRef.current?.flyTo({
       center: [location.longitude, location.latitude],
       zoom: location.zoom,
@@ -60,12 +33,24 @@ export default function Page() {
       duration: 2500,
       essential: true,
     })
+    setLocation(location.label)
+  }
+
+  const jumpIntoLocation = (long: number, lat: number) => {
+    mapRef.current?.flyTo({
+      center: [long, lat],
+      zoom: 12,
+      pitch: 75,
+      bearing: 0,
+      duration: 2500,
+      essential: true,
+    })
   }
 
   return (
     <div className="flex h-screen w-full bg-background text-foreground overflow-hidden">
       {/* Sidebar Controls */}
-      <div className="w-80 border-r border-border bg-card p-6 flex flex-col gap-6 overflow-y-auto z-10 shadow-lg">
+      <div className="w-80 p-6 flex flex-col gap-6 overflow-y-auto z-10">
         <div>
           <h1 className="text-2xl font-bold tracking-tight mb-2">Mapbox POC</h1>
           <p className="text-sm text-muted-foreground">Interactive Mapbox Implementation</p>
@@ -92,24 +77,18 @@ export default function Page() {
           <div className="space-y-3">
             <h3 className="text-sm font-semibold">Fly To Location</h3>
             <div className="flex flex-col gap-2">
-              <button
-                className="px-4 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium rounded-md transition-all shadow-sm active:scale-95 text-left"
-                onClick={() => flyTo(INDONESIA_BBOX)}
-              >
-                🇮🇩 Indonesia (Default)
-              </button>
-              <button
-                className="px-4 py-2.5 bg-secondary text-secondary-foreground hover:bg-secondary/80 text-sm font-medium rounded-md transition-all border border-border active:scale-95 text-left"
-                onClick={() => flyTo(JAKARTA_BBOX)}
-              >
-                🏙️ Jakarta
-              </button>
-              <button
-                className="px-4 py-2.5 bg-secondary text-secondary-foreground hover:bg-secondary/80 text-sm font-medium rounded-md transition-all border border-border active:scale-95 text-left"
-                onClick={() => flyTo(SURABAYA_BBOX)}
-              >
-                🏙️ Surabaya
-              </button>
+              {CITIES.map((city) => (
+                <button
+                  key={city.label}
+                  className={cx(
+                    'px-4 py-2.5 hover:bg-primary/90 hover:cursor-pointer text-sm font-medium rounded-md transition-all shadow-sm active:scale-95 text-left',
+                    city.label === location && 'bg-primary text-white'
+                  )}
+                  onClick={() => flyTo(city)}
+                >
+                  {city.label}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -142,7 +121,12 @@ export default function Page() {
 
       {/* Main Map Viewer */}
       <div className="flex-1 relative bg-muted">
-        <MapViewer ref={mapRef} mapStyle={mapStyle} useBoundaries={showGeoJson} />
+        <MapViewer
+          ref={mapRef}
+          mapStyle={mapStyle}
+          useBoundaries={showGeoJson}
+          flyTo={jumpIntoLocation}
+        />
       </div>
     </div>
   )

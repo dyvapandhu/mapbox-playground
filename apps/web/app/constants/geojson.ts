@@ -1,6 +1,6 @@
 import type { FeatureCollection } from 'geojson'
 
-export const IG_GEOJSON: FeatureCollection = {
+export const ID_GEOJSON: FeatureCollection = {
   "type": "FeatureCollection",
   "features": [
     {
