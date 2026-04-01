@@ -3,15 +3,14 @@ import type {
   FillLayerSpecification,
   LngLatBoundsLike,
   MapMouseEvent,
-  SkyLayer,
   SkyLayerSpecification,
 } from 'mapbox-gl'
-import { forwardRef, useCallback, useState } from 'react'
+import { forwardRef, useCallback, useMemo, useState } from 'react'
 import type { MapRef } from 'react-map-gl/mapbox'
 import Map, { Layer, Source } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { cx } from 'tailwind-variants'
-import { ID_GEOJSON } from '#/constants/geojson'
+import { STANDARD_STYLES } from '#/constants/map'
 import type { DataLayer } from '#/types/map'
 
 type MapViewerProps = {
@@ -85,6 +84,10 @@ export const MapViewer = forwardRef<MapRef, MapViewerProps>(
     const onMouseEnter = useCallback(() => setCursor('pointer'), [])
     const onMouseLeave = useCallback(() => setCursor('auto'), [])
 
+    const isStandard = useMemo(() => {
+      return STANDARD_STYLES.includes(mapStyle)
+    }, [mapStyle])
+
     return (
       <div className={cx(className, 'relative w-full h-full')}>
         {mapboxToken ? (
@@ -108,15 +111,19 @@ export const MapViewer = forwardRef<MapRef, MapViewerProps>(
             onMouseLeave={onMouseLeave}
           >
             {/* 3D Terrain Source */}
-            {/* <Source
-              id="mapbox-dem"
-              type="raster-dem"
-              url="mapbox://mapbox.mapbox-terrain-dem-v1"
-              tileSize={512}
-              maxzoom={14}
-            />
-            <Layer {...skyLayer} />
-            <Layer {...buildingsLayer} /> */}
+            {!isStandard && (
+              <>
+                <Source
+                  id="mapbox-dem"
+                  type="raster-dem"
+                  url="mapbox://mapbox.mapbox-terrain-dem-v1"
+                  tileSize={512}
+                  maxzoom={14}
+                />
+                <Layer {...skyLayer} />
+                <Layer {...buildingsLayer} />
+              </>
+            )}
             {dataLayers.map((layer) => (
               <Source key={layer.id} id={layer.id} type="geojson" data={layer.data}>
                 <Layer id={layer.id} {...geoJsonLayer} />

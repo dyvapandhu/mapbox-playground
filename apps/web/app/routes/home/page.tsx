@@ -64,7 +64,6 @@ export default function Page() {
           <h1 className="text-2xl font-bold tracking-tight mb-2">Mapbox POC</h1>
           <p className="text-sm text-muted-foreground">Interactive Mapbox Implementation</p>
         </div>
-
         <div className="space-y-6">
           {/* Basemap */}
           <div className="flex flex-col gap-2">
