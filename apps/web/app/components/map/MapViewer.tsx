@@ -1,21 +1,23 @@
 import type {
-  FillExtrusionLayer,
-  FillLayer,
+  FillExtrusionLayerSpecification,
+  FillLayerSpecification,
   LngLatBoundsLike,
   MapMouseEvent,
   SkyLayer,
+  SkyLayerSpecification,
 } from 'mapbox-gl'
 import { forwardRef, useCallback, useState } from 'react'
-import type { MapRef, ViewState, ViewStateChangeEvent } from 'react-map-gl/mapbox'
+import type { MapRef } from 'react-map-gl/mapbox'
 import Map, { Layer, Source } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { cx } from 'tailwind-variants'
 import { ID_GEOJSON } from '#/constants/geojson'
+import type { DataLayer } from '#/types/map'
 
 type MapViewerProps = {
   mapStyle: string
+  dataLayers: DataLayer[]
   className?: string
-  useBoundaries?: boolean
   flyTo?: (long: number, lat: number) => void
 }
 
@@ -24,9 +26,9 @@ const maxBounds: LngLatBoundsLike = [
   [142.0, 7.0], // Northeast (Max Lng, Max Lat)
 ]
 
-const geoJsonLayer: Omit<FillLayer, 'source'> = {
-  id: 'geojson-layer',
+const geoJsonLayer: Omit<FillLayerSpecification, 'id'> = {
   type: 'fill',
+  source: 'composite',
   paint: {
     'fill-color': 'transparent',
     'fill-opacity': 0.9,
@@ -34,7 +36,7 @@ const geoJsonLayer: Omit<FillLayer, 'source'> = {
   },
 }
 
-const buildingsLayer: FillExtrusionLayer = {
+const buildingsLayer: FillExtrusionLayerSpecification = {
   id: '3d-buildings',
   source: 'composite',
   'source-layer': 'building',
@@ -57,7 +59,7 @@ const buildingsLayer: FillExtrusionLayer = {
   },
 }
 
-const skyLayer: SkyLayer = {
+const skyLayer: SkyLayerSpecification = {
   id: 'sky',
   type: 'sky',
   paint: {
@@ -70,7 +72,7 @@ const skyLayer: SkyLayer = {
 const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN
 
 export const MapViewer = forwardRef<MapRef, MapViewerProps>(
-  ({ mapStyle, className, useBoundaries, flyTo }, ref) => {
+  ({ mapStyle, dataLayers, className, flyTo }, ref) => {
     const [cursor, setCursor] = useState<string>('auto')
 
     const onClick = useCallback((event: MapMouseEvent) => {
@@ -100,13 +102,13 @@ export const MapViewer = forwardRef<MapRef, MapViewerProps>(
             style={{ width: '100%', height: '100%' }}
             terrain={{ source: 'mapbox-dem', exaggeration: 1.5 }}
             maxBounds={maxBounds}
-            interactiveLayerIds={['geojson-layer']}
+            interactiveLayerIds={dataLayers.map((layer) => layer.id)}
             onClick={onClick}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
           >
             {/* 3D Terrain Source */}
-            <Source
+            {/* <Source
               id="mapbox-dem"
               type="raster-dem"
               url="mapbox://mapbox.mapbox-terrain-dem-v1"
@@ -114,15 +116,12 @@ export const MapViewer = forwardRef<MapRef, MapViewerProps>(
               maxzoom={14}
             />
             <Layer {...skyLayer} />
-            <Layer {...buildingsLayer} />
-            {useBoundaries && (
-              <Source id="id-geojson" type="geojson" data={ID_GEOJSON}>
-                <Layer {...geoJsonLayer} />
+            <Layer {...buildingsLayer} /> */}
+            {dataLayers.map((layer) => (
+              <Source key={layer.id} id={layer.id} type="geojson" data={layer.data}>
+                <Layer id={layer.id} {...geoJsonLayer} />
               </Source>
-            )}
-            <Source id="kws-trans" type="geojson" data="/geojson/kws.geojson">
-              <Layer {...geoJsonLayer} />
-            </Source>
+            ))}
           </Map>
         ) : (
           <div className="flex flex-col items-center justify-center w-full h-full bg-muted text-muted-foreground p-6 text-center">

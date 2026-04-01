@@ -1,9 +1,10 @@
 import type { FeatureCollection } from 'geojson'
-import { useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import type { MapRef } from 'react-map-gl/mapbox'
 import { cx } from 'tailwind-variants'
 import { CITIES } from '#/constants/location'
-import type { Location } from '#/types/map'
+import { DATA_LAYERS, MAP_STYLES } from '#/constants/map'
+import type { DataLayer, Location } from '#/types/map'
 import { MapViewer } from '../../components/map/MapViewer'
 import type { Route } from './+types/page'
 
@@ -11,18 +12,11 @@ export function meta(_props: Route.MetaArgs) {
   return [{ title: 'Map Dashboard' }, { name: 'description', content: 'Mapbox POC' }]
 }
 
-const MAP_STYLES = [
-  { label: 'Streets', value: 'mapbox://styles/mapbox/streets-v12' },
-  { label: 'Satellite', value: 'mapbox://styles/mapbox/satellite-v9' },
-  { label: 'Light', value: 'mapbox://styles/mapbox/light-v11' },
-  { label: 'Dark', value: 'mapbox://styles/mapbox/dark-v11' },
-]
-
 export default function Page() {
   const mapRef = useRef<MapRef>(null)
   const [location, setLocation] = useState(CITIES[0].label)
   const [mapStyle, setMapStyle] = useState(MAP_STYLES[0].value)
-  const [showGeoJson, setShowGeoJson] = useState(false)
+  const [activeLayers, setActiveLayers] = useState<DataLayer[]>([])
 
   const flyTo = (location: Location) => {
     mapRef.current?.flyTo({
@@ -45,6 +39,21 @@ export default function Page() {
       duration: 2500,
       essential: true,
     })
+  }
+
+  const handleLayerOnClick = useCallback(
+    (layer: DataLayer) => {
+      const isLayerExist = activeLayers.some((item) => item.id === layer.id)
+
+      setActiveLayers((prev) => {
+        return !isLayerExist ? [...prev, layer] : prev.filter((item) => item.id !== layer.id)
+      })
+    },
+    [activeLayers]
+  )
+
+  const isCurrentLayerActive = (layer: DataLayer) => {
+    return activeLayers.some((item) => item.id === layer.id)
   }
 
   return (
@@ -95,26 +104,23 @@ export default function Page() {
           {/* Dynamic GeoJSON */}
           <div className="space-y-3 pt-4 border-t border-border">
             <h3 className="text-sm font-semibold">Data Layers</h3>
-            <button
-              className={`w-full px-4 py-3 text-sm font-medium rounded-md transition-all flex items-center justify-between active:scale-95 ${
-                showGeoJson
-                  ? 'bg-blue-100 text-blue-800 border-2 border-blue-300 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-700 shadow-sm'
-                  : 'bg-background hover:bg-muted border-2 border-border/50 text-muted-foreground'
-              }`}
-              onClick={() => setShowGeoJson(!showGeoJson)}
-            >
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-3 h-3 rounded-sm ${showGeoJson ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`}
-                ></div>
-                <span>Provinces</span>
-              </div>
-              <span
-                className={`text-xs px-2 py-0.5 rounded-full ${showGeoJson ? 'bg-blue-200 dark:bg-blue-800/60' : 'bg-muted-foreground/20'}`}
+            {DATA_LAYERS.map((layer) => (
+              <button
+                key={layer.id}
+                className={cx(
+                  'w-full px-4 py-3 text-sm font-medium rounded-md transition-all flex items-center justify-between active:scale-95',
+                  isCurrentLayerActive(layer)
+                    ? 'bg-blue-100 text-blue-800 border-2 border-blue-300 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-700 shadow-sm'
+                    : 'bg-background hover:bg-muted border-2 border-border/50 text-muted-foreground'
+                )}
+                onClick={() => handleLayerOnClick(layer)}
               >
-                {showGeoJson ? 'ON' : 'OFF'}
-              </span>
-            </button>
+                <span>{layer.label}</span>
+                <span className={cx('text-xs px-2 py-0.5 rounded-full bg-muted-foreground/20')}>
+                  {isCurrentLayerActive(layer) ? 'ON' : 'OFF'}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -124,7 +130,7 @@ export default function Page() {
         <MapViewer
           ref={mapRef}
           mapStyle={mapStyle}
-          useBoundaries={showGeoJson}
+          dataLayers={activeLayers}
           flyTo={jumpIntoLocation}
         />
       </div>

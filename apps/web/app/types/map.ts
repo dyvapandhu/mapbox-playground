@@ -1,3 +1,4 @@
+import type { FeatureCollection } from 'geojson'
 export interface Location {
   label: string
   longitude: number
@@ -5,4 +6,10 @@ export interface Location {
   zoom: number
   pitch?: number
   bearing?: number
+}
+
+export interface DataLayer {
+  id: string
+  label: string
+  data: FeatureCollection | string
 }
