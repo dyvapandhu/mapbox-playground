@@ -1,4 +1,5 @@
 import type { FeatureCollection } from 'geojson'
+
 export interface Location {
   label: string
   longitude: number

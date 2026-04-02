@@ -49,53 +49,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <div className="min-h-screen bg-background text-foreground">
-          <header className="border-b bg-card">
-            <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-              <div className="flex items-center gap-3">
-                <img
-                  src="/images/logo-light.svg"
-                  alt="Logo"
-                  className="block h-8 w-auto dark:hidden"
-                />
-                <img
-                  src="/images/logo-dark.svg"
-                  alt="Logo"
-                  className="hidden h-8 w-auto dark:block"
-                />
-              </div>
-              <nav className="flex items-center gap-5 text-sm">
-                <Link
-                  to="/"
-                  activeOptions={{ exact: true }}
-                  activeProps={{ className: 'text-foreground' }}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  Home
-                </Link>
-                <Link
-                  to="/dashboard"
-                  activeProps={{ className: 'text-foreground' }}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  to="/login"
-                  activeProps={{ className: 'text-foreground' }}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  Sign In
-                </Link>
-                <a href="/api/health" className="text-muted-foreground hover:text-foreground">
-                  Health
-                </a>
-              </nav>
-            </div>
-          </header>
-
-          {children}
-        </div>
+        <div className="min-h-screen bg-background text-foreground">{children}</div>
 
         {import.meta.env.DEV ? <TanStackRouterDevtools position="bottom-right" /> : null}
         <Scripts />

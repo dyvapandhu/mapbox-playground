@@ -53,12 +53,12 @@
             "correctness": {
                 "noUnusedImports": {
                     "level": "error",
-                    "fix": "none",
+                    "fix": "safe",
                     "options": {}
                 },
                 "noUnusedVariables": {
                     "level": "warn",
-                    "fix": "none",
+                    "fix": "safe",
                     "options": {
                         "ignoreRestSiblings": true
                     }
