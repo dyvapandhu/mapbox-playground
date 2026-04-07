@@ -1,6 +1,5 @@
-import type { FeatureCollection } from 'geojson'
 import { useCallback, useRef, useState } from 'react'
-import type { MapRef } from 'react-map-gl/mapbox'
+import { type MapRef } from 'react-map-gl/mapbox'
 import { cx } from 'tailwind-variants'
 import { CITIES } from '#/constants/location'
 import { DATA_LAYERS, MAP_STYLES } from '#/constants/map'
@@ -17,6 +16,7 @@ export default function Page() {
   const [location, setLocation] = useState(CITIES[0].label)
   const [mapStyle, setMapStyle] = useState(MAP_STYLES[0].value)
   const [activeLayers, setActiveLayers] = useState<DataLayer[]>([])
+  const [showLabel, setShowLabel] = useState<boolean>(true)
 
   const flyTo = (location: Location) => {
     mapRef.current?.flyTo({
@@ -54,6 +54,15 @@ export default function Page() {
 
   const isCurrentLayerActive = (layer: DataLayer) => {
     return activeLayers.some((item) => item.id === layer.id)
+  }
+
+  const toggleLabel = () => {
+    if (!mapRef.current) return
+
+    mapRef.current.setConfigProperty('basemap', 'showPlaceLabels', !showLabel)
+    mapRef.current.setConfigProperty('basemap', 'showRoadLabels', !showLabel)
+
+    setShowLabel(prev => !prev)
   }
 
   return (
@@ -120,6 +129,12 @@ export default function Page() {
                 </span>
               </button>
             ))}
+          </div>
+          <div className="space-y-3 pt-4 border-t border-border">
+            <h3 className="text-sm font-semibold">Show Places Label</h3>
+            <button className='hover:cursor-pointer' onClick={toggleLabel}>
+              {showLabel ? 'ON' : 'OFF'}
+            </button>
           </div>
         </div>
       </div>

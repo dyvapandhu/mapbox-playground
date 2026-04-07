@@ -13,6 +13,7 @@ export const MAP_STYLES = [
   { label: 'Satellite', value: 'mapbox://styles/mapbox/satellite-v9' },
   { label: 'Light', value: 'mapbox://styles/mapbox/light-v11' },
   { label: 'Dark', value: 'mapbox://styles/mapbox/dark-v11' },
+  { label: 'Contour', value: 'mapbox://styles/dgttransmigrasidev/cmno2bbaa002i01qt89e7g8hc' }
 ]
 
 export const DATA_LAYERS: DataLayer[] = [

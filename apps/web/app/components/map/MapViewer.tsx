@@ -41,6 +41,7 @@ const geoJsonOutlineLayer: Omit<LineLayerSpecification, 'id'> = {
   paint: {
     'line-color': '#fc0320',
     'line-width': 0.8,
+    'line-emissive-strength': 1
   },
 }
 
@@ -90,7 +91,14 @@ export const MapViewer = forwardRef<MapRef, MapViewerProps>(
       if (selectedFeatures && flyTo) flyTo(event.lngLat.lng, event.lngLat.lat)
     }, [])
 
-    const onMouseEnter = useCallback(() => setCursor('pointer'), [])
+    const onMouseEnter = useCallback((event: MapMouseEvent) => {
+      setCursor('pointer')
+
+      const { features } = event
+      const selectedFeatures = features && features[0]
+
+      if (selectedFeatures) console.info(selectedFeatures)
+    }, [])
     const onMouseLeave = useCallback(() => setCursor('auto'), [])
 
     const isStandard = useMemo(() => {
@@ -120,7 +128,7 @@ export const MapViewer = forwardRef<MapRef, MapViewerProps>(
             onMouseLeave={onMouseLeave}
           >
             {/* 3D Terrain Source */}
-            {!isStandard && (
+            {/* {!isStandard && (
               <>
                 <Source
                   id="mapbox-dem"
@@ -132,7 +140,7 @@ export const MapViewer = forwardRef<MapRef, MapViewerProps>(
                 <Layer {...skyLayer} />
                 <Layer {...buildingsLayer} />
               </>
-            )}
+            )} */}
             {dataLayers.map((layer) => (
               <Source key={layer.id} type="geojson" data={layer.data}>
                 <Layer id={layer.id} {...geoJsonFillLayer} />
