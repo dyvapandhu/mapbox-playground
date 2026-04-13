@@ -1,5 +1,3 @@
-import type { FeatureCollection } from 'geojson'
-
 export interface Location {
   label: string
   longitude: number
@@ -10,7 +8,46 @@ export interface Location {
 }
 
 export interface DataLayer {
-  id: string
   label: string
-  data: FeatureCollection | string
+  tilesetId: string
+  sourceLayer: string
+}
+export interface WaybackConfigEntry {
+  itemID: string
+  itemTitle: string
+  itemURL: string
+  metadataLayerUrl: string
+  metadataLayerItemID: string
+  layerIdentifier: string
+}
+
+export type WaybackConfigRaw = Record<string, WaybackConfigEntry>
+
+export interface WaybackItem extends WaybackConfigEntry {
+  releaseNum: number
+  dateLabel: string
+}
+
+export interface Marker {
+  longitude: number
+  latitude: number
+}
+
+export type ResourceType = 'palm' | 'wheat' | 'corn' | 'coconut'
+
+export interface Cluster {
+  id: number
+  longitude: number
+  latitude: number
+  resources: ResourceType[]
+}
+
+export interface IconGroupProps {
+  resources: ResourceType[]
+  zoom: number
+  overlap?: 'sm' | 'md' | 'lg'
+}
+
+export interface IconProps {
+  size?: number
 }

@@ -4,7 +4,7 @@ export const errorStyles = tv({
   slots: {
     wrapper: 'relative min-h-screen overflow-hidden bg-background',
     decorativeGradient: 'absolute inset-0 overflow-hidden',
-    gradientInner: '-inset-[10px] absolute opacity-50',
+    gradientInner: 'absolute -inset-[10px] opacity-50',
     gradientBg: [
       'absolute top-0 h-[40rem] w-full',
       'bg-gradient-to-b from-muted via-transparent to-transparent',
@@ -21,8 +21,8 @@ export const errorStyles = tv({
     code: 'text-muted-foreground',
     actions: 'mt-10 flex items-center justify-center gap-x-4',
     primaryButton: [
-      'min-w-[140px] cursor-pointer rounded-md bg-primary px-4 py-2.5 font-semibold text-sm text-primary-foreground',
-      'transition-all duration-200 hover:bg-primary/90 hover:shadow-primary/20 hover:shadow-lg',
+      'min-w-[140px] cursor-pointer rounded-md bg-primary px-4 py-2.5 font-semibold text-primary-foreground text-sm',
+      'transition-all duration-200 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20',
       'focus:outline-none focus:ring-2 focus:ring-ring/50 focus:ring-offset-2',
       'focus:ring-offset-background',
       'border border-border',
@@ -31,7 +31,7 @@ export const errorStyles = tv({
       'min-w-[140px] rounded-md border border-border bg-background/80 px-4 py-2.5',
       'cursor-pointer font-semibold text-foreground text-sm',
       'transition-all duration-200 hover:border-border/30 hover:bg-accent',
-      'hover:text-accent-foreground hover:shadow-ring/10 hover:shadow-lg',
+      'hover:text-accent-foreground hover:shadow-lg hover:shadow-ring/10',
       'focus:outline-none focus:ring-2 focus:ring-ring/50 focus:ring-offset-2',
       'focus:ring-offset-background',
     ],

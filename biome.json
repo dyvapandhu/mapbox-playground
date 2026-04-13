@@ -37,7 +37,6 @@
     },
     "linter": {
         "enabled": true,
-        "includes": ["!.astro"],
         "rules": {
             "recommended": true,
             "a11y": {
@@ -57,11 +56,15 @@
                     "options": {}
                 },
                 "noUnusedVariables": {
-                    "level": "warn",
-                    "fix": "safe",
+                    "level": "error",
+                    "fix": "unsafe",
                     "options": {
                         "ignoreRestSiblings": true
                     }
+                },
+                "noUnusedFunctionParameters": {
+                    "level": "error",
+                    "fix": "unsafe"
                 },
                 "noChildrenProp": "off",
                 "noUnknownFunction": "off",
@@ -154,8 +157,7 @@
     },
     "css": {
         "parser": {
-            "allowWrongLineComments": false,
-            "tailwindDirectives": true
+            "allowWrongLineComments": false
         },
         "formatter": {
             "enabled": true,

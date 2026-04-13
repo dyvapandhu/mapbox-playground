@@ -5,7 +5,7 @@ export const CITIES: Location[] = [
     label: 'Indonesia (Default)',
     longitude: 118.0149,
     latitude: -2.5489,
-    zoom: 4.2,
+    zoom: 4,
     pitch: 0,
     bearing: 0,
   },

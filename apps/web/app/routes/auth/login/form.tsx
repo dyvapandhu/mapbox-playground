@@ -9,7 +9,7 @@ function SubmitButton() {
   return (
     <button
       type="submit"
-      className="w-full rounded-lg bg-blue-600 px-4 py-2 text-white font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+      className="w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400"
       disabled={pending}
     >
       {pending ? 'Signing in...' : 'Sign in'}

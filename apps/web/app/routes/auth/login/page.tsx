@@ -43,7 +43,7 @@ export default function Page() {
             href="/"
             className="text-gray-600 text-sm hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
           >
-            <Lucide.ArrowLeft className="-ml-0.5 mr-1 inline-block size-4" />
+            <Lucide.ArrowLeft className="mr-1 -ml-0.5 inline-block size-4" />
             <span>Back to homepage</span>
           </Link>
         </div>
